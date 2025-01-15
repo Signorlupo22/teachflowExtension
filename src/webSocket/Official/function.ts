@@ -13,23 +13,30 @@ import { createFileJson, gitCloneJson, highlightCodeJson, insertCodeJson, remove
 ///    "type": "gitclone"
 ///     "url": "github ulr","
 /// }
-export function gitClone(json : gitCloneJson , currentDir : string) {
-    exec(
-        //TODO parse this for avoid command injection
-        `git clone ${json.url} .`,
-        { cwd: currentDir },
-        (error, stdout, stderr) => {
-            if (error) {
-                vscode.window.showErrorMessage(`Errore: ${error.message}`);
-                return;
+export function gitClone(json: gitCloneJson, currentDir: string): Promise<{ type: string, status: string, message?: string }> {
+    return new Promise((resolve, reject) => {
+        var parsedUrl = new URL(json.url);
+        exec(
+            //TODO parse this for avoid command injection
+
+            `git clone ${parsedUrl} .`,
+            { cwd: currentDir },
+            (error, stdout, stderr) => {
+                if (error) {
+                    vscode.window.showErrorMessage(`Errore: ${error.message}`);
+                    reject({ type: "gitClone", status: "error", message: error.message });
+                    return;
+                }
+                if (stderr) {
+                    vscode.window.showErrorMessage(`stderr: ${stderr}`);
+                    reject({ type: "gitClone", status: "error", message: stderr });
+                    return;
+                }
+                vscode.window.showInformationMessage(`stdout: ${stdout}`);
+                resolve({ type: "gitClone", status: "ok" });
             }
-            if (stderr) {
-                vscode.window.showErrorMessage(`stderr: ${stderr}`);
-                return;
-            }
-            vscode.window.showInformationMessage(`stdout: ${stdout}`);
-        }
-    );
+        );
+    });
 }
 /// Function to insert code in a file
 /// @param json: json object with the file path, the string to search and the code to insert

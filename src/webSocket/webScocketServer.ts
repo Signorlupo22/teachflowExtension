@@ -6,14 +6,18 @@ import { createFile, gitClone, highlightCode, insertCode, removeCode } from './O
 /// the json object is parsed and the type of the request is checked
 /// if you want to create a new type you have to add a new case in the switch
 /// and create a new function in function.js
-export function decodeResponse(data: string, currentDir: string) : any {
+export async function decodeResponse(data: string, currentDir: string): Promise<any> {
   console.log(`Received: ${data}`);
   const json = JSON.parse(data);
 
   switch (json.type) {
     case "gitClone":
-      gitClone(json, currentDir);
-      return { type: "gitClone", status: "ok" };
+      try {
+        await gitClone(json, currentDir);
+        return { type: "gitClone", status: "ok" };
+      } catch (err) {
+        return err;
+      }
     case "insertCode":
       insertCode(json, currentDir);
       return { type: "insertCode", status: "ok" };
@@ -28,6 +32,7 @@ export function decodeResponse(data: string, currentDir: string) : any {
       return { type: "highlightCode", status: "ok" };
     default:
       vscode.window.showErrorMessage("Teachflow: Invalid request type");
+      return { type: "error", status: "Invalid request type", message: "Invalid request type" };
       break;
   }
 }

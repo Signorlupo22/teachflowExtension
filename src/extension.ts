@@ -32,11 +32,11 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	const sendMessage = vscode.commands.registerCommand('teachflow.sendTestMessage', () => {
-		const message = 'Hello from VS Code!';
+		const message = { type: 'test', message: 'Hello from Teachflow!' };
 		if (wss) {
 			wss.clients.forEach((client) => {
 				if (client.readyState === WebSocket.OPEN) {
-					client.send(message);
+					client.send(JSON.stringify(message));
 				}
 			});
 		}
@@ -84,9 +84,9 @@ function startWebSocketServer(port: number, context: vscode.ExtensionContext) {
 	wss.on('connection', (ws : any) => {
 		console.log('Browser connected to WebSocket server!');
 
-		ws.on('message', (message : any) => {
+		ws.on('message', async (message : any) => {
 			console.log(`Received: ${message}`);
-			var res = decodeResponse(message, currentDir);
+			var res = await decodeResponse(message, currentDir);
 			ws.send(JSON.stringify(res));
 		});
 
