@@ -87,6 +87,7 @@ function startWebSocketServer(port: number, context: vscode.ExtensionContext) {
 		ws.on('message', async (message : any) => {
 			console.log(`Received: ${message}`);
 			var res = await decodeResponse(message, currentDir);
+			console.log(`Sending: ${JSON.stringify(res)}`);
 			ws.send(JSON.stringify(res));
 		});
 

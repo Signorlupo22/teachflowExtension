@@ -23,17 +23,18 @@ export function gitClone(json: gitCloneJson, currentDir: string): Promise<{ type
             { cwd: currentDir },
             (error, stdout, stderr) => {
                 if (error) {
-                    vscode.window.showErrorMessage(`Errore: ${error.message}`);
+                    vscode.window.showErrorMessage(`error: ${error.message}`);
                     reject({ type: "gitClone", status: "error", message: error.message });
                     return;
                 }
                 if (stderr) {
-                    vscode.window.showErrorMessage(`stderr: ${stderr}`);
-                    reject({ type: "gitClone", status: "error", message: stderr });
-                    return;
+                    vscode.window.showInformationMessage(`error: ${stderr}`);
+                    resolve({ type: "gitClone", status: "error", message: stderr });
+                    return { type: "gitClone", status: "error", message: stderr };
                 }
                 vscode.window.showInformationMessage(`stdout: ${stdout}`);
-                resolve({ type: "gitClone", status: "ok" });
+                resolve({ type: "gitClone", status: "ok", message: stdout });
+                return { type: "gitClone", status: "ok", message: stdout };
             }
         );
     });

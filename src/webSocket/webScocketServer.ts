@@ -13,14 +13,14 @@ export async function decodeResponse(data: string, currentDir: string): Promise<
   switch (json.type) {
     case "gitClone":
       try {
-        await gitClone(json, currentDir);
-        return { type: "gitClone", status: "ok" };
+        const res = await gitClone(json, currentDir);
+        return res;
       } catch (err) {
-        return err;
+        return { type: "error", status: "failed", message: err };
       }
     case "insertCode":
       insertCode(json, currentDir);
-      return { type: "insertCode", status: "ok" };
+      return { type: "insertCode", status: "ok", message: "Code inserted" };
     case "removeCode":
       removeCode(json, currentDir);
       return { type: "removeCode", status: "ok" };
