@@ -10,30 +10,47 @@ export async function decodeResponse(data: string, currentDir: string): Promise<
   console.log(`Received: ${data}`);
   const json = JSON.parse(data);
 
+  let res: any;
+
   switch (json.type) {
     case "gitClone":
       try {
-        const res = await gitClone(json, currentDir);
+        res = await gitClone(json, currentDir);
         return res;
       } catch (err) {
-        return { type: "error", status: "failed", message: err };
+        return err;
       }
     case "insertCode":
-      insertCode(json, currentDir);
-      return { type: "insertCode", status: "ok", message: "Code inserted" };
+      try {
+        res = await insertCode(json, currentDir);
+        return res;
+      } catch (err) {
+        return err;
+      }
     case "removeCode":
-      removeCode(json, currentDir);
-      return { type: "removeCode", status: "ok" };
+      try {
+        res = await removeCode(json, currentDir);
+        return res;
+      } catch (err) {
+        return err;
+      }
     case "createFile":
-      createFile(json, currentDir);
-      return { type: "createFile", status: "ok" };
+      try {
+        res = await createFile(json, currentDir);
+        return res;
+      } catch (err) {
+        return err;
+      }
     case "highlightCode":
-      highlightCode(json, currentDir);
-      return { type: "highlightCode", status: "ok" };
+      try {
+        res = await highlightCode(json, currentDir);
+        return res;
+      } catch (err) {
+        return err;
+      }
     default:
       vscode.window.showErrorMessage("Teachflow: Invalid request type");
       return { type: "error", status: "Invalid request type", message: "Invalid request type" };
-      break;
   }
 }
 

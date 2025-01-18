@@ -50,86 +50,94 @@ export function gitClone(json: gitCloneJson, currentDir: string): Promise<{ type
 ///     "searchString": "string to search",
 ///     "code": "code to insert"
 /// }
-export function insertCode(json : insertCodeJson, currentDir: string) {
-    const searchString = json.searchString; // Stringa da cercare
-    const filePath = path.join(currentDir, json.file);
-    const fileUri = vscode.Uri.file(filePath);
+export function insertCode(json: insertCodeJson, currentDir: string) {
+    return new Promise((resolve, reject) => {
+        const searchString = json.searchString; // Stringa da cercare
+        const filePath = path.join(currentDir, json.file);
+        const fileUri = vscode.Uri.file(filePath);
 
-    vscode.workspace.openTextDocument(fileUri).then(
-        (document) => {
-            const text = document.getText();
-            const lines = text.split("\n");
-            let line = -1;
+        vscode.workspace.openTextDocument(fileUri).then(
+            (document) => {
+                const text = document.getText();
+                const lines = text.split("\n");
+                let line = -1;
 
-            // Cerca la stringa nel documento
-            for (let i = 0; i < lines.length; i++) {
-                if (lines[i].includes(searchString)) {
-                    line = i + 1; // Inserisce subito dopo la riga trovata
-                    break;
+                // Cerca la stringa nel documento
+                for (let i = 0; i < lines.length; i++) {
+                    if (lines[i].includes(searchString)) {
+                        line = i + 1; // Inserisce subito dopo la riga trovata
+                        break;
+                    }
                 }
-            }
 
-            if (line !== -1) {
-                vscode.window.showTextDocument(document).then((editor) => {
-                    const position = new vscode.Position(line, 0);
+                if (line !== -1) {
+                    vscode.window.showTextDocument(document).then((editor) => {
+                        const position = new vscode.Position(line, 0);
 
-                    // Creazione della decorazione per evidenziare il testo
-                    const decorationType =
-                        vscode.window.createTextEditorDecorationType({
-                            backgroundColor: "rgba(0, 255, 0, 0.3)", // Verde semi-trasparente
-                        });
+                        // Creazione della decorazione per evidenziare il testo
+                        const decorationType =
+                            vscode.window.createTextEditorDecorationType({
+                                backgroundColor: "rgba(0, 255, 0, 0.3)", // Verde semi-trasparente
+                            });
 
-                    editor
-                        .edit((editBuilder) => {
-                            editBuilder.insert(position, `\n${json.code}`);
-                        })
-                        .then((success) => {
-                            if (success) {
-                                vscode.window.showInformationMessage(
-                                    `Codice inserito in ${json.file} dopo la stringa "${searchString}"`
-                                );
+                        editor
+                            .edit((editBuilder) => {
+                                editBuilder.insert(position, `\n${json.code}`);
+                            })
+                            .then((success) => {
+                                if (success) {
+                                    vscode.window.showInformationMessage(
+                                        `Codice inserito in ${json.file} dopo la stringa "${searchString}"`
+                                    );
 
-                                const startPos = position;
-                                const endPos = new vscode.Position(
-                                    startPos.line +
+                                    const startPos = position;
+                                    const endPos = new vscode.Position(
+                                        startPos.line +
                                         json.code.split("\n").length -
                                         1,
-                                    json.code.split("\n").slice(-1)[0].length
-                                );
-                                const range = new vscode.Range(
-                                    startPos,
-                                    endPos
-                                );
+                                        json.code.split("\n").slice(-1)[0].length
+                                    );
+                                    const range = new vscode.Range(
+                                        startPos,
+                                        endPos
+                                    );
 
-                                editor.setDecorations(decorationType, [range]);
+                                    editor.setDecorations(decorationType, [range]);
 
-                                setTimeout(() => {
-                                    editor.setDecorations(decorationType, []);
-                                }, 2000);
-                            } else {
-                                vscode.window.showErrorMessage(
-                                    "Error during code insertion"
-                                );
+                                    setTimeout(() => {
+                                        editor.setDecorations(decorationType, []);
+                                    }, 2000);
 
-                                return { type: "insertCode", status: "error", message: "Error during code insertion" }; 
-                            }
-                        });
-                });
-            } else {
+
+                                    resolve({ type: "insertCode", status: "ok", message: `Code inserted in ${json.file} after the string "${searchString}"` });
+                                } else {
+                                    vscode.window.showErrorMessage(
+                                        "Error during code insertion"
+                                    );
+                                    reject({ type: "insertCode", status: "error", message: "Error during code insertion" });
+                                    return { type: "insertCode", status: "error", message: "Error during code insertion" };
+                                }
+                            });
+                    });
+                } else {
+                    vscode.window.showErrorMessage(
+                        `"${searchString}" not found.`
+                    );
+                    resolve({ type: "insertCode", status: "error", message: `"${searchString}" not found.` });
+                    return { type: "insertCode", status: "error", message: `"${searchString}" not found.` };
+                }
+            },
+            (error) => {
                 vscode.window.showErrorMessage(
-                    `"${searchString}" not found.`
+                    `Error open the file: ${error.message}`
                 );
-
-                return { type: "insertCode", status: "error", message: `"${searchString}" not found.` };
+                reject({ type: "insertCode", status: "error", message: `Error open the file: ${error.message}` });
             }
-        },
-        (error) => {
-            vscode.window.showErrorMessage(
-                `Error open the file: ${error.message}`
-            );
-            return { type: "insertCode", status: "error", message: `Errore nell'aprire il file: ${error.message}` };
-        }
-    );
+        );
+
+        // resolve({ type: "insertCode", status: "ok", message: `Code inserted in ${json.file} after the string "${searchString}"` });
+    });
+    
 }
 /// Function to remove code from a file
 /// @param json: json object with the file path and the code to remove
@@ -141,93 +149,98 @@ export function insertCode(json : insertCodeJson, currentDir: string) {
 ///     "file": "file path",
 ///     "code": "code to remove"
 /// }
-export function removeCode(json : removeCodeJson, currentDir: string) {
-    const removeFilePath = path.join(currentDir, json.file);
-    const removeFileUri = vscode.Uri.file(removeFilePath);
+export function removeCode(json: removeCodeJson, currentDir: string) {
+    return new Promise((resolve, reject) => {
+        const removeFilePath = path.join(currentDir, json.file);
+        const removeFileUri = vscode.Uri.file(removeFilePath);
 
-    vscode.workspace.openTextDocument(removeFileUri).then(
-        (document) => {
-            vscode.window.showTextDocument(document).then((editor) => {
-                const codeToRemove = json.code.split("\n"); // Codice da rimuovere, diviso per linee
-                const text = document.getText();
-                const lines = text.split("\n");
-                let found = false;
+        vscode.workspace.openTextDocument(removeFileUri).then(
+            (document) => {
+                vscode.window.showTextDocument(document).then((editor) => {
+                    const codeToRemove = json.code.split("\n"); // Codice da rimuovere, diviso per linee
+                    const text = document.getText();
+                    const lines = text.split("\n");
+                    let found = false;
 
-                const rangesToDelete: vscode.Range[] = []; // Raccogliamo tutti i range da cancellare
+                    const rangesToDelete: vscode.Range[] = []; // Raccogliamo tutti i range da cancellare
 
-                codeToRemove.forEach((codeLine) => {
-                    for (let i = 0; i < lines.length; i++) {
-                        const line = lines[i];
-                        const index = line.indexOf(codeLine);
+                    codeToRemove.forEach((codeLine) => {
+                        for (let i = 0; i < lines.length; i++) {
+                            const line = lines[i];
+                            const index = line.indexOf(codeLine);
 
-                        if (index !== -1) {
-                            found = true;
-                            const startPosition = new vscode.Position(i, index);
-                            const endPosition = new vscode.Position(
-                                i,
-                                index + codeLine.length
-                            );
-                            const range = new vscode.Range(
-                                startPosition,
-                                endPosition
-                            );
+                            if (index !== -1) {
+                                found = true;
+                                const startPosition = new vscode.Position(i, index);
+                                const endPosition = new vscode.Position(
+                                    i,
+                                    index + codeLine.length
+                                );
+                                const range = new vscode.Range(
+                                    startPosition,
+                                    endPosition
+                                );
 
-                            // Creazione della decorazione per evidenziare il testo da rimuovere
-                            const decorationType =
-                                vscode.window.createTextEditorDecorationType({
-                                    backgroundColor: "rgba(255, 0, 0, 0.3)", // Rosso semi-trasparente
-                                });
+                                // Creazione della decorazione per evidenziare il testo da rimuovere
+                                const decorationType =
+                                    vscode.window.createTextEditorDecorationType({
+                                        backgroundColor: "rgba(255, 0, 0, 0.3)", // Rosso semi-trasparente
+                                    });
 
-                            editor.setDecorations(decorationType, [range]);
-                            rangesToDelete.push(range); // Aggiungiamo il range alla lista
+                                editor.setDecorations(decorationType, [range]);
+                                rangesToDelete.push(range); // Aggiungiamo il range alla lista
+                            }
                         }
-                    }
-                });
+                    });
 
-                // Rimozione delle decorazioni e delle linee dopo 2 secondi
-                setTimeout(() => {
-                    if (rangesToDelete.length > 0) {
-                        editor.setDecorations(
-                            vscode.window.createTextEditorDecorationType({}),
-                            []
-                        ); // Rimozione decorazione
+                    // Rimozione delle decorazioni e delle linee dopo 2 secondi
+                    setTimeout(() => {
+                        if (rangesToDelete.length > 0) {
+                            editor.setDecorations(
+                                vscode.window.createTextEditorDecorationType({}),
+                                []
+                            ); // Rimozione decorazione
 
-                        editor
-                            .edit((editBuilder) => {
-                                rangesToDelete.forEach((range) => {
-                                    editBuilder.delete(range);
+                            editor
+                                .edit((editBuilder) => {
+                                    rangesToDelete.forEach((range) => {
+                                        editBuilder.delete(range);
+                                    });
+                                })
+                                .then((success) => {
+                                    if (success) {
+                                        vscode.window.showInformationMessage(
+                                            `Code remove from ${json.file}`
+                                        );
+                                        resolve({ type: "removeCode", status: "ok", message: `Code removed from ${json.file}` });
+                                        return { type: "removeCode", status: "ok", message: `Code removed from ${json.file}` };
+                                    } else {
+                                        vscode.window.showErrorMessage(
+                                            "Error during code removal"
+                                        );
+                                        reject({ type: "removeCode", status: "error", message: "Error during code removal" });
+                                        return { type: "removeCode", status: "error", message: "Error during code removal" };
+                                    }
                                 });
-                            })
-                            .then((success) => {
-                                if (success) {
-                                    vscode.window.showInformationMessage(
-                                        `Code remove from ${json.file}`
-                                    );
-                                    return { type: "removeCode", status: "ok", message: `Code removed from ${json.file}` };
-                                } else {
-                                    vscode.window.showErrorMessage(
-                                        "Error during code removal"
-                                    );
-                                    return { type: "removeCode", status: "error", message: "Error during code removal" };
-                                }
-                            });
-                    } else {
-                        vscode.window.showErrorMessage(
-                            `Code in ${json.file} not found.`
-                        );
-                        return { type: "removeCode", status: "error", message: `Code in ${json.file} not found.` };
-                    }
-                }, 2000);
-            });
-        },
-        (error) => {
-            vscode.window.showErrorMessage(
-                `Error when opening file: ${error.message}`
-            );
-
-            return { type: "removeCode", status: "error", message: `Error when opening file ${error.message}` };
-        }
-    );
+                        } else {
+                            vscode.window.showErrorMessage(
+                                `Code in ${json.file} not found.`
+                            );
+                            resolve({ type: "removeCode", status: "error", message: `Code in ${json.file} not found.` });
+                            return { type: "removeCode", status: "error", message: `Code in ${json.file} not found.` };
+                        }
+                    }, 2000);
+                });
+            },
+            (error) => {
+                vscode.window.showErrorMessage(
+                    `Error when opening file: ${error.message}`
+                );
+                reject({ type: "removeCode", status: "error", message: `Error when opening file ${error.message}` });
+                return { type: "removeCode", status: "error", message: `Error when opening file ${error.message}` };
+            }
+        );
+    });
 }
 
 /// Function to create a file
@@ -240,46 +253,50 @@ export function removeCode(json : removeCodeJson, currentDir: string) {
 ///     "file": "file path",
 ///     "content": "file content"
 /// }
-export function createFile(json : createFileJson, currentDir: string) {
-    const createFilePath = path.join(currentDir, json.file);
-    const dirPath = path.dirname(createFilePath);
+export function createFile(json: createFileJson, currentDir: string) {
+    return new Promise((resolve, reject) => {
+        const createFilePath = path.join(currentDir, json.file);
+        const dirPath = path.dirname(createFilePath);
 
-    // Crea le directory se non esistono
-    if (!fs.existsSync(dirPath)) {
-        fs.mkdirSync(dirPath, { recursive: true });
-    }
-
-    if (fs.existsSync(createFilePath)) {
-        vscode.window.showErrorMessage(
-            `${json.file} already exists`
-        );
-        return { type: "createFile", status: "error", message: `${json.file} already exists` };
-    }
-
-    fs.writeFileSync(createFilePath, json.content || "", "utf8");
-
-    // Mostra un messaggio di successo
-    vscode.window.showInformationMessage(
-        `File ${json.file} creato con successo.`
-    );
-    
-    
-    // Apri il file nell'editor
-    const fileUri2 = vscode.Uri.file(createFilePath);
-    vscode.workspace.openTextDocument(fileUri2).then(
-        (document) => {
-            vscode.window.showTextDocument(document);
-        },
-        (error) => {
-            vscode.window.showErrorMessage(
-                `Error opening file: ${error.message}`
-            );
-
-
-            return { type: "createFile", status: "error", message: `Error opening file: ${error.message}` };
+        // Crea le directory se non esistono
+        if (!fs.existsSync(dirPath)) {
+            fs.mkdirSync(dirPath, { recursive: true });
         }
-    );
-    return { type: "createFile", status: "ok", message: `File ${json.file} Created.` };
+
+        if (fs.existsSync(createFilePath)) {
+            vscode.window.showErrorMessage(
+                `${json.file} already exists`
+            );
+            reject({ type: "createFile", status: "error", message: `${json.file} already exists` });
+            return { type: "createFile", status: "error", message: `${json.file} already exists` };
+        }
+
+        fs.writeFileSync(createFilePath, json.content || "", "utf8");
+
+        // Mostra un messaggio di successo
+        vscode.window.showInformationMessage(
+            `File ${json.file} creato con successo.`
+        );
+
+
+        // Apri il file nell'editor
+        const fileUri2 = vscode.Uri.file(createFilePath);
+        vscode.workspace.openTextDocument(fileUri2).then(
+            (document) => {
+                vscode.window.showTextDocument(document);
+            },
+            (error) => {
+                vscode.window.showErrorMessage(
+                    `Error opening file: ${error.message}`
+                );
+
+                reject({ type: "createFile", status: "error", message: `Error opening file: ${error.message}` });
+                return { type: "createFile", status: "error", message: `Error opening file: ${error.message}` };
+            }
+        );
+        resolve({ type: "createFile", status: "ok", message: `File ${json.file} Created.` });
+        return { type: "createFile", status: "ok", message: `File ${json.file} Created.` };
+    });
 
 }
 
@@ -295,93 +312,98 @@ export function createFile(json : createFileJson, currentDir: string) {
 ///     "code": "code to highlight"
 ///     "tooltip": "tooltip message"
 /// }
-export function highlightCode(json : highlightCodeJson, currentDir: string) {
-    const highlightFilePath = path.join(currentDir, json.file);
+export function highlightCode(json: highlightCodeJson, currentDir: string) {
+    return new Promise((resolve, reject) => {
+        const highlightFilePath = path.join(currentDir, json.file);
 
-    if (!fs.existsSync(highlightFilePath)) {
-        vscode.window.showErrorMessage(
-            `File non trovato: ${json.file}`
-        );
-        return;
-    }
-
-    const highlightFileUri = vscode.Uri.file(highlightFilePath);
-
-    vscode.workspace.openTextDocument(highlightFileUri).then(
-        (document) => {
-            vscode.window.showTextDocument(document).then((editor) => {
-                const documentText = document.getText();
-                const startIndex = documentText.indexOf(json.code);
-
-                if (startIndex === -1) {
-                    vscode.window.showErrorMessage(
-                        `Code not found: ${json.code}`
-                    );
-                    return { type: "highlightCode", status: "error", message: `Code not found: ${json.code}` };
-                }
-
-                const startPosition = document.positionAt(startIndex);
-                const endPosition = document.positionAt(
-                    startIndex + json.code.length
-                );
-                const range = new vscode.Range(
-                    startPosition,
-                    endPosition
-                );
-
-                // Seleziona e evidenzia il testo
-                editor.selection = new vscode.Selection(
-                    startPosition,
-                    endPosition
-                );
-                editor.revealRange(
-                    range,
-                    vscode.TextEditorRevealType.InCenter
-                );
-
-                // Aggiungi un hover provider per visualizzare il tooltip
-                const hoverProvider =
-                    vscode.languages.registerHoverProvider(
-                        {
-                            scheme: "file",
-                            language: "javascript",
-                        },
-                        {
-                            provideHover: (document, position) => {
-                                if (range.contains(position)) {
-                                    return new vscode.Hover(
-                                        json.tooltip
-                                    );
-                                }
-                            },
-                        }
-                    );
-
-                // Mostra il tooltip subito dopo aver evidenziato
-                vscode.commands.executeCommand(
-                    "editor.action.showHover"
-                );
-
-                // Registra il provider temporaneamente
-                const disposable =
-                    vscode.Disposable.from(hoverProvider);
-
-                // Rimuovi il provider dopo 10 secondi (o a piacere)
-                setTimeout(() => {
-                    disposable.dispose();
-                }, 10000);
-
-                return { type: "highlightCode", status: "ok", message: `Code highlighted: ${json.code}` };
-            });
-        },
-        (error) => {
+        if (!fs.existsSync(highlightFilePath)) {
             vscode.window.showErrorMessage(
-                `Errore nell'aprire il file: ${error.message}`
+                `File non trovato: ${json.file}`
             );
-
-            return { type: "highlightCode", status: "error", message: `Errore nell'aprire il file: ${error.message}` };
+            return;
         }
-    );
+
+        const highlightFileUri = vscode.Uri.file(highlightFilePath);
+
+        vscode.workspace.openTextDocument(highlightFileUri).then(
+            (document) => {
+                vscode.window.showTextDocument(document).then((editor) => {
+                    const documentText = document.getText();
+                    const startIndex = documentText.indexOf(json.code);
+
+                    if (startIndex === -1) {
+                        vscode.window.showErrorMessage(
+                            `Code not found: ${json.code}`
+                        );
+                        reject({ type: "highlightCode", status: "error", message: `Code not found: ${json.code}` });
+                        return { type: "highlightCode", status: "error", message: `Code not found: ${json.code}` };
+                    }
+
+                    const startPosition = document.positionAt(startIndex);
+                    const endPosition = document.positionAt(
+                        startIndex + json.code.length
+                    );
+                    const range = new vscode.Range(
+                        startPosition,
+                        endPosition
+                    );
+
+                    // Seleziona e evidenzia il testo
+                    editor.selection = new vscode.Selection(
+                        startPosition,
+                        endPosition
+                    );
+                    editor.revealRange(
+                        range,
+                        vscode.TextEditorRevealType.InCenter
+                    );
+
+                    // Aggiungi un hover provider per visualizzare il tooltip
+                    const hoverProvider =
+                        vscode.languages.registerHoverProvider(
+                            {
+                                scheme: "file",
+                                language: "javascript",
+                            },
+                            {
+                                provideHover: (document, position) => {
+                                    if (range.contains(position)) {
+                                        return new vscode.Hover(
+                                            json.tooltip
+                                        );
+                                    }
+                                },
+                            }
+                        );
+
+                    // Mostra il tooltip subito dopo aver evidenziato
+                    vscode.commands.executeCommand(
+                        "editor.action.showHover"
+                    );
+
+                    // Registra il provider temporaneamente
+                    const disposable =
+                        vscode.Disposable.from(hoverProvider);
+
+                    // Rimuovi il provider dopo 10 secondi (o a piacere)
+                    setTimeout(() => {
+                        disposable.dispose();
+                    }, 10000);
+
+                    resolve({ type: "highlightCode", status: "ok", message: `Code highlighted: ${json.code}` });
+                    return { type: "highlightCode", status: "ok", message: `Code highlighted: ${json.code}` };
+                });
+            },
+            (error) => {
+                vscode.window.showErrorMessage(
+                    `Errore nell'aprire il file: ${error.message}`
+                );
+
+                reject({ type: "highlightCode", status: "error", message: `Errore nell'aprire il file: ${error.message}` });
+                return { type: "highlightCode", status: "error", message: `Errore nell'aprire il file: ${error.message}` };
+            }
+        );
+    });
 }
 
 
