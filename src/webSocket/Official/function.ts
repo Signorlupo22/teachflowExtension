@@ -108,21 +108,26 @@ export function insertCode(json : insertCodeJson, currentDir: string) {
                                 }, 2000);
                             } else {
                                 vscode.window.showErrorMessage(
-                                    "Errore durante l'inserimento del codice."
+                                    "Error during code insertion"
                                 );
+
+                                return { type: "insertCode", status: "error", message: "Error during code insertion" }; 
                             }
                         });
                 });
             } else {
                 vscode.window.showErrorMessage(
-                    `Stringa "${searchString}" non trovata nel file.`
+                    `"${searchString}" not found.`
                 );
+
+                return { type: "insertCode", status: "error", message: `"${searchString}" not found.` };
             }
         },
         (error) => {
             vscode.window.showErrorMessage(
-                `Errore nell'aprire il file: ${error.message}`
+                `Error open the file: ${error.message}`
             );
+            return { type: "insertCode", status: "error", message: `Errore nell'aprire il file: ${error.message}` };
         }
     );
 }
@@ -196,26 +201,31 @@ export function removeCode(json : removeCodeJson, currentDir: string) {
                             .then((success) => {
                                 if (success) {
                                     vscode.window.showInformationMessage(
-                                        `Codice rimosso da ${json.file}`
+                                        `Code remove from ${json.file}`
                                     );
+                                    return { type: "removeCode", status: "ok", message: `Code removed from ${json.file}` };
                                 } else {
                                     vscode.window.showErrorMessage(
-                                        "Errore durante la rimozione del codice."
+                                        "Error during code removal"
                                     );
+                                    return { type: "removeCode", status: "error", message: "Error during code removal" };
                                 }
                             });
                     } else {
                         vscode.window.showErrorMessage(
-                            `Il codice specificato non è stato trovato in ${json.file}.`
+                            `Code in ${json.file} not found.`
                         );
+                        return { type: "removeCode", status: "error", message: `Code in ${json.file} not found.` };
                     }
                 }, 2000);
             });
         },
         (error) => {
             vscode.window.showErrorMessage(
-                `Errore nell'aprire il file: ${error.message}`
+                `Error when opening file: ${error.message}`
             );
+
+            return { type: "removeCode", status: "error", message: `Error when opening file ${error.message}` };
         }
     );
 }
@@ -241,9 +251,9 @@ export function createFile(json : createFileJson, currentDir: string) {
 
     if (fs.existsSync(createFilePath)) {
         vscode.window.showErrorMessage(
-            `Il file ${json.file} esiste già.`
+            `${json.file} already exists`
         );
-        return;
+        return { type: "createFile", status: "error", message: `${json.file} already exists` };
     }
 
     fs.writeFileSync(createFilePath, json.content || "", "utf8");
@@ -252,7 +262,8 @@ export function createFile(json : createFileJson, currentDir: string) {
     vscode.window.showInformationMessage(
         `File ${json.file} creato con successo.`
     );
-
+    
+    
     // Apri il file nell'editor
     const fileUri2 = vscode.Uri.file(createFilePath);
     vscode.workspace.openTextDocument(fileUri2).then(
@@ -261,10 +272,14 @@ export function createFile(json : createFileJson, currentDir: string) {
         },
         (error) => {
             vscode.window.showErrorMessage(
-                `Errore nell'aprire il file: ${error.message}`
+                `Error opening file: ${error.message}`
             );
+
+
+            return { type: "createFile", status: "error", message: `Error opening file: ${error.message}` };
         }
     );
+    return { type: "createFile", status: "ok", message: `File ${json.file} Created.` };
 
 }
 
@@ -300,9 +315,9 @@ export function highlightCode(json : highlightCodeJson, currentDir: string) {
 
                 if (startIndex === -1) {
                     vscode.window.showErrorMessage(
-                        `Codice non trovato nel file: ${json.code}`
+                        `Code not found: ${json.code}`
                     );
-                    return;
+                    return { type: "highlightCode", status: "error", message: `Code not found: ${json.code}` };
                 }
 
                 const startPosition = document.positionAt(startIndex);
@@ -355,12 +370,16 @@ export function highlightCode(json : highlightCodeJson, currentDir: string) {
                 setTimeout(() => {
                     disposable.dispose();
                 }, 10000);
+
+                return { type: "highlightCode", status: "ok", message: `Code highlighted: ${json.code}` };
             });
         },
         (error) => {
             vscode.window.showErrorMessage(
                 `Errore nell'aprire il file: ${error.message}`
             );
+
+            return { type: "highlightCode", status: "error", message: `Errore nell'aprire il file: ${error.message}` };
         }
     );
 }

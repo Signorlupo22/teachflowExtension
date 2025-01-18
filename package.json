@@ -1,10 +1,14 @@
 {
   "name": "teachflow",
-  "displayName": "TeachflowLocal",
+  "displayName": "TeachFlow",
   "description": "",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "engines": {
     "vscode": "^1.96.0"
+  },
+    "repository": {
+    "type": "git",
+    "url": "https://github.com/Signorlupo22/teachFlowex.git"
   },
   "categories": [
     "Other"
