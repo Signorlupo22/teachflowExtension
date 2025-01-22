@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import WebSocket from 'ws';
-import { createFile, gitClone, highlightCode, insertCode, removeCode } from './Official/function';
+import { createFile, execCode, gitClone, highlightCode, insertCode, removeCode } from './Official/function';
 
 ///all the request from the server are decoded here
 /// the json object is parsed and the type of the request is checked
@@ -44,6 +44,13 @@ export async function decodeResponse(data: string, currentDir: string): Promise<
     case "highlightCode":
       try {
         res = await highlightCode(json, currentDir);
+        return res;
+      } catch (err) {
+        return err;
+      }
+    case "execCode":
+      try {
+        res = await execCode(json, currentDir);
         return res;
       } catch (err) {
         return err;

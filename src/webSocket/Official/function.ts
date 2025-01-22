@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { exec } from "child_process";
 import * as path from "path";
 import * as fs from "fs";
-import { createFileJson, gitCloneJson, highlightCodeJson, insertCodeJson, removeCodeJson } from '../../interface/ws';
+import { createFileJson, ExecCodeJson, gitCloneJson, highlightCodeJson, insertCodeJson, removeCodeJson } from '../../interface/ws';
 
 /// Function to clone a git repository
 /// @param json: json object with the url of the repository
@@ -407,3 +407,14 @@ export function highlightCode(json: highlightCodeJson, currentDir: string) {
 }
 
 
+export function execCode(json: ExecCodeJson, currentDir: string): Promise<{ type: string, status: string, message?: string }> {
+    return new Promise((resolve, reject) => {
+        const terminal = vscode.window.createTerminal({ cwd: currentDir });
+        console.log(json.content);
+        terminal.sendText(json.content);
+        
+        terminal.show();
+        resolve({ type: "ExecCode", status: "ok", message: "Code executed in terminal" });
+        // Aspetta un breve periodo per assicurarti che il terminale sia pronto
+    });
+}

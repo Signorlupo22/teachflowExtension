@@ -35,3 +35,7 @@ export interface highlightCodeJson extends WebSocketMessage {
     tooltip: string;
 }
 
+export interface ExecCodeJson extends WebSocketMessage {
+    type: "execCode";
+    content: string;
+}
