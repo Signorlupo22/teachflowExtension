@@ -88,7 +88,7 @@ function startWebSocketServer(port: number, context: vscode.ExtensionContext) {
 
 		console.log(`Origin: ${origin}`);
 		
-		if (origin !== "https://teachflow.app") {
+		if (origin !== "https://teachflow.app" && origin !== "http://localhost:3000") {
 			console.log(`Connection rejected from origin: ${origin}`);
 			ws.close(); // Chiude immediatamente la connessione
 			return;
