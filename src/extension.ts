@@ -81,8 +81,19 @@ function startWebSocketServer(port: number, context: vscode.ExtensionContext) {
 
 	wss = new WebSocketServer( { port });
 
-	wss.on('connection', (ws : any) => {
+	wss.on('connection', (ws : any, req: any) => {
 		console.log('Browser connected to WebSocket server!');
+
+		const origin = req.headers.origin;
+
+		console.log(`Origin: ${origin}`);
+		
+		if (origin !== "https://teachflow.app") {
+			console.log(`Connection rejected from origin: ${origin}`);
+			ws.close(); // Chiude immediatamente la connessione
+			return;
+		}
+	
 
 		ws.on('message', async (message : any) => {
 			console.log(`Received: ${message}`);
