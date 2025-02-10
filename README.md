@@ -24,7 +24,7 @@ The **Teachflow VS Code Extension** is a powerful tool designed to enhance your 
 
 ## Demo
 [![Demo](https://img.youtube.com/vi/thOU4fCL-V0/0.jpg)](https://www.youtube.com/watch?v=thOU4fCL-V0&ab_channel=ChomasDev)
-
+<iframe width="560" height="315" src="https://www.youtube.com/embed/thOU4fCL-V0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 ## Usage
 
 ### 1. Start Authentication Session
