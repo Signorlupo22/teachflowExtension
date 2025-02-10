@@ -7,31 +7,37 @@
 3. copy the code from the course/Demo
 4. enjoy
 
-rember to start the session in a blank folder or the git clone wont work
+remember to start the session in a blank folder or the git clone won't work
 
 ## Overview
 
-The **Teachflow VS Code Extension** is a powerful tool designed to enhance your development workflow within Visual Studio Code by allowing you to interact with a specific remote service. The extension integrates with the remote service hosted at `https://teachflow.app`, enabling you to perform various operations such as code insertion, code removal, file creation, and more directly from within VS Code.
+The **Teachflow VS Code Extension** is a powerful tool designed to enhance your development workflow within Visual Studio Code by allowing you to interact with a specific remote service. The extension integrates with the remote service hosted at [`https://teachflow.app`](https://teachflow.app), enabling you to perform various operations such as code insertion, code removal, file creation, and more directly from within VS Code.
 
 ## Features
 
-- **WebSocket Integration**: Establish a WebSocket connection to receive real-time commands from the `https://teachflow.app` service.
+- **WebSocket Integration**: Establish a WebSocket connection to receive real-time commands from the [`https://teachflow.app`](https://teachflow.app) service.
 - **Code Insertion**: Automatically insert code into specified files at locations based on search strings.
 - **Code Removal**: Remove specific code snippets from files, preserving indentation and surrounding content.
 - **File Creation**: Create new files and folders with specified content.
 - **Code Highlighting**: Highlight specific code segments and display tooltips.
 
 
+## Demo
+<!-- [![Demo](https://img.youtube.com/vi/thOU4fCL-V0/0.jpg)](https://www.youtube.com/watch?v=thOU4fCL-V0&ab_channel=ChomasDev) -->
+<a href="https://www.youtube.com/watch?v=thOU4fCL-V0&ab_channel=ChomasDev" target="_blank">
+  <img src="https://img.youtube.com/vi/thOU4fCL-V0/0.jpg" alt="Watch the video" width="560">
+</a>
+
 ## Usage
 
 ### 1. Start Authentication Session
 
 - **Command**: `Teachflow.startSession`
-- **Description**: the extension will connect to a WebSocket server whit the broswere.
+- **Description**: the extension will connect to a WebSocket server with the browser.
 
 ### 2. WebSocket Connection
 
-- Once authenticated, the extension establishes a WebSocket connection whit the broswere
+- Once authenticated, the extension establishes a WebSocket connection with the browser
   - **gitClone**: Clones a repository into the current workspace.
   - **insertCode**: Inserts specified code at a location in a file based on a search string.
   - **removeCode**: Removes specified code from a file, keeping the indentation intact.
@@ -43,7 +49,7 @@ The **Teachflow VS Code Extension** is a powerful tool designed to enhance your 
 - **Command**: `insertCode`
 - **Parameters**:
   - `file`: The target file where the code will be inserted.
-  - `searchString`: A string used to locate where the code should be inserted.
+  - `searchString`: A string is used to locate where the code should be inserted.
   - `code`: The code snippet to insert.
 - **Behavior**: The code is inserted immediately after the line containing the `searchString`. The inserted code is highlighted temporarily.
 
@@ -83,7 +89,7 @@ To modify or extend the functionality of this extension:
 
 ## Contributing
 
-Contributions are welcome! Please submit a pull request or open an issue to suggest improvements or create new intergration.
+Contributions are welcome! Please submit a pull request or open an issue to suggest improvements or create new integration.
 
 ## License
 
