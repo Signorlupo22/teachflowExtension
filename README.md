@@ -11,11 +11,11 @@ remember to start the session in a blank folder or the git clone won't work
 
 ## Overview
 
-The **Teachflow VS Code Extension** is a powerful tool designed to enhance your development workflow within Visual Studio Code by allowing you to interact with a specific remote service. The extension integrates with the remote service hosted at `https://teachflow.app`, enabling you to perform various operations such as code insertion, code removal, file creation, and more directly from within VS Code.
+The **Teachflow VS Code Extension** is a powerful tool designed to enhance your development workflow within Visual Studio Code by allowing you to interact with a specific remote service. The extension integrates with the remote service hosted at [`https://teachflow.app`](https://teachflow.app), enabling you to perform various operations such as code insertion, code removal, file creation, and more directly from within VS Code.
 
 ## Features
 
-- **WebSocket Integration**: Establish a WebSocket connection to receive real-time commands from the `https://teachflow.app` service.
+- **WebSocket Integration**: Establish a WebSocket connection to receive real-time commands from the [`https://teachflow.app`](https://teachflow.app) service.
 - **Code Insertion**: Automatically insert code into specified files at locations based on search strings.
 - **Code Removal**: Remove specific code snippets from files, preserving indentation and surrounding content.
 - **File Creation**: Create new files and folders with specified content.
@@ -24,7 +24,7 @@ The **Teachflow VS Code Extension** is a powerful tool designed to enhance your 
 
 ## Demo
 [![Demo](https://img.youtube.com/vi/thOU4fCL-V0/0.jpg)](https://www.youtube.com/watch?v=thOU4fCL-V0&ab_channel=ChomasDev)
-<iframe width="560" height="315" src="https://www.youtube.com/embed/thOU4fCL-V0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 ## Usage
 
 ### 1. Start Authentication Session
