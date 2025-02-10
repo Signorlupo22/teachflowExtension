@@ -27,6 +27,7 @@ The **Teachflow VS Code Extension** is a powerful tool designed to enhance your 
 <a href="https://www.youtube.com/watch?v=thOU4fCL-V0&ab_channel=ChomasDev" target="_blank">
   <img src="https://img.youtube.com/vi/thOU4fCL-V0/0.jpg" alt="Watch the video" width="560">
 </a>
+
 ## Usage
 
 ### 1. Start Authentication Session
