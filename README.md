@@ -7,7 +7,7 @@
 3. copy the code from the course/Demo
 4. enjoy
 
-rember to start the session in a blank folder or the git clone wont work
+remember to start the session in a blank folder or the git clone won't work
 
 ## Overview
 
@@ -22,16 +22,19 @@ The **Teachflow VS Code Extension** is a powerful tool designed to enhance your 
 - **Code Highlighting**: Highlight specific code segments and display tooltips.
 
 
+## Demo
+[![Demo](https://img.youtube.com/vi/thOU4fCL-V0/0.jpg)](https://www.youtube.com/watch?v=thOU4fCL-V0&ab_channel=ChomasDev)
+
 ## Usage
 
 ### 1. Start Authentication Session
 
 - **Command**: `Teachflow.startSession`
-- **Description**: the extension will connect to a WebSocket server whit the broswere.
+- **Description**: the extension will connect to a WebSocket server with the browser.
 
 ### 2. WebSocket Connection
 
-- Once authenticated, the extension establishes a WebSocket connection whit the broswere
+- Once authenticated, the extension establishes a WebSocket connection with the browser
   - **gitClone**: Clones a repository into the current workspace.
   - **insertCode**: Inserts specified code at a location in a file based on a search string.
   - **removeCode**: Removes specified code from a file, keeping the indentation intact.
@@ -43,7 +46,7 @@ The **Teachflow VS Code Extension** is a powerful tool designed to enhance your 
 - **Command**: `insertCode`
 - **Parameters**:
   - `file`: The target file where the code will be inserted.
-  - `searchString`: A string used to locate where the code should be inserted.
+  - `searchString`: A string is used to locate where the code should be inserted.
   - `code`: The code snippet to insert.
 - **Behavior**: The code is inserted immediately after the line containing the `searchString`. The inserted code is highlighted temporarily.
 
@@ -83,7 +86,7 @@ To modify or extend the functionality of this extension:
 
 ## Contributing
 
-Contributions are welcome! Please submit a pull request or open an issue to suggest improvements or create new intergration.
+Contributions are welcome! Please submit a pull request or open an issue to suggest improvements or create new integration.
 
 ## License
 
