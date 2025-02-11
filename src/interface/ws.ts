@@ -5,7 +5,6 @@ export interface WebSocketMessage {
 export interface gitCloneJson extends WebSocketMessage {
     type: "gitClone";
     url: string;
-    folder: string;
 }
 
 export interface insertCodeJson extends WebSocketMessage {
@@ -17,7 +16,6 @@ export interface insertCodeJson extends WebSocketMessage {
 
 export interface removeCodeJson extends WebSocketMessage {
     type: "removeCode";
-    searchString: string;
     file: string;
     code: string;   
 }

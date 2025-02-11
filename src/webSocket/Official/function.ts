@@ -278,12 +278,15 @@ export function createFile(json: createFileJson, currentDir: string) {
             `File ${json.file} creato con successo.`
         );
 
-
         // Apri il file nell'editor
         const fileUri2 = vscode.Uri.file(createFilePath);
         vscode.workspace.openTextDocument(fileUri2).then(
             (document) => {
-                vscode.window.showTextDocument(document);
+                vscode.window.showTextDocument(document).then((editor) => {
+                    editor.document.save().then(() => {
+                        resolve({ type: "createFile", status: "ok", message: `File ${json.file} Created and saved.` });
+                    });
+                });
             },
             (error) => {
                 vscode.window.showErrorMessage(
@@ -294,10 +297,7 @@ export function createFile(json: createFileJson, currentDir: string) {
                 return { type: "createFile", status: "error", message: `Error opening file: ${error.message}` };
             }
         );
-        resolve({ type: "createFile", status: "ok", message: `File ${json.file} Created.` });
-        return { type: "createFile", status: "ok", message: `File ${json.file} Created.` };
     });
-
 }
 
 
