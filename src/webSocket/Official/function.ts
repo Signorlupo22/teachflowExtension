@@ -87,7 +87,7 @@ export function insertCode(json: insertCodeJson, currentDir: string) {
                             .then((success) => {
                                 if (success) {
                                     vscode.window.showInformationMessage(
-                                        `Codice inserito in ${json.file} dopo la stringa "${searchString}"`
+                                        `Code inserted in ${json.file} after the string "${searchString}"`
                                     );
 
                                     const startPos = position;
@@ -108,8 +108,10 @@ export function insertCode(json: insertCodeJson, currentDir: string) {
                                         editor.setDecorations(decorationType, []);
                                     }, 2000);
 
-
-                                    resolve({ type: "insertCode", status: "ok", message: `Code inserted in ${json.file} after the string "${searchString}"` });
+                                    editor.document.save().then(() => {
+                                        resolve({ type: "insertCode", status: "ok", message: `Code inserted in ${json.file} after the string "${searchString}"` });
+                                    });
+                                    
                                 } else {
                                     vscode.window.showErrorMessage(
                                         "Error during code insertion"
@@ -212,7 +214,9 @@ export function removeCode(json: removeCodeJson, currentDir: string) {
                                         vscode.window.showInformationMessage(
                                             `Code remove from ${json.file}`
                                         );
-                                        resolve({ type: "removeCode", status: "ok", message: `Code removed from ${json.file}` });
+                                        editor.document.save().then(() => {
+                                            resolve({ type: "removeCode", status: "ok", message: `Code removed from ${json.file}` });
+                                        });
                                         return { type: "removeCode", status: "ok", message: `Code removed from ${json.file}` };
                                     } else {
                                         vscode.window.showErrorMessage(
