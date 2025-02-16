@@ -42,8 +42,14 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	}
 	);
-
 	context.subscriptions.push(sendMessage);
+
+	const stopWSServer = vscode.commands.registerCommand('teachflow.stopWebSocketServer', () => {
+		stopWebSocketServer();
+		vscode.window.showInformationMessage('Session stopped.');
+	});
+	context.subscriptions.push(stopWSServer);
+
 
 	// Registra un comando per abilitare/disabilitare l'avvio automatico
 	const toggleAutoStart = vscode.commands.registerCommand('teachflow.toggleAutoStart', async () => {
@@ -113,8 +119,15 @@ function startWebSocketServer(port: number, context: vscode.ExtensionContext) {
 // Funzione per fermare il server WebSocket
 function stopWebSocketServer() {
 	if (wss) {
-		wss.close(() => {
-			console.log('WebSocket server stopped');
+		wss.clients.forEach((client) => {
+			client.close();
+		});
+		wss.close((err) => {
+			if (err) {
+				console.error('Error closing WebSocket server:', err);
+			} else {
+				console.log('WebSocket server stopped');
+			}
 		});
 		wss = null;
 	}

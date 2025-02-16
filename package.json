@@ -32,6 +32,11 @@
         "category": "Teachflow"
       },
       {
+        "command": "teachflow.stopWebSocketServer",
+        "title": "Stop Session",
+        "category": "Teachflow"
+      },
+      {
         "command": "teachflow.toggleAutoStart",
         "title": "Toggle Auto Start",
         "category": "Teachflow"
