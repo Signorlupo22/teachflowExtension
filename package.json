@@ -4,6 +4,7 @@
   "publisher": "TeachFlow",
   "description": "",
   "version": "0.1.4",
+  "icon": "images/teachflowvscodextimage.png",
   "engines": {
     "vscode": "^1.96.0"
   },
